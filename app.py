@@ -31,7 +31,6 @@ DISEASE_TRANSLATE = {
 st.title("🌱 Hệ Thống Chẩn Đoán Bệnh Lá Chè")
 conf_threshold = st.slider("Ngưỡng độ tin cậy", 0.1, 0.9, 0.25, 0.05)
 
-# Chia giao diện thành 2 tab: Chụp ảnh & Tải tệp
 tab1, tab2 = st.tabs(["📸 Chụp ảnh trực tiếp", "📁 Tải ảnh từ thiết bị"])
 
 img_file = None
@@ -62,22 +61,7 @@ if img_file is not None:
                 cls_en = model.names[cls_id]
                 cls_vn = DISEASE_TRANSLATE.get(cls_en, cls_en)
                 conf = float(box.conf[0]) * 100
-                st.success(f"**Vết bệnh #{i}:** {cls_vn.upper()} — Độ tin cậy: **{conf:.1f}%**").1, 0.9, 0.25, 0.05)
-img_file = st.file_uploader("Tải ảnh hoặc chụp ảnh lá chè...", type=["jpg", "jpeg", "png"])
-
-if img_file is not None:
-    image = Image.open(img_file)
-    if st.button("🔍 Tiến Hành Chẩn Đoán", type="primary"):
-        results = model.predict(source=image, conf=conf_threshold)
-        r = results[0]
-        annotated_img = cv2.cvtColor(r.plot(line_width=4), cv2.COLOR_BGR2RGB)
-        st.image(annotated_img, caption="Kết quả khoanh vùng vết bệnh", use_container_width=True)
-        
-        if len(r.boxes) == 0:
-            st.info("⚠️ Không phát hiện vết bệnh (Lá khỏe mạnh hoặc thử hạ thấp ngưỡng độ tin cậy).")
-        else:
-            for i, box in enumerate(r.boxes, 1):
-                cls_id = int(box.cls[0])
+                st.success(f"**Vết bệnh #{i}:** {cls_vn.upper()} — Độ tin cậy: **{conf:.1f}%**")
                 cls_en = model.names[cls_id]
                 cls_vn = DISEASE_TRANSLATE.get(cls_en, cls_en)
                 conf = float(box.conf[0]) * 100
